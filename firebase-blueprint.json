@@ -1,0 +1,143 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile, balances, streak, and referral info",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 50 },
+        "role": { "type": "string", "enum": ["USER", "ADMIN", "SUPPORT", "MODERATOR"] },
+        "avatar": { "type": "string" },
+        "country": { "type": "string" },
+        "isEmailVerified": { "type": "boolean" },
+        "isBanned": { "type": "boolean" },
+        "availableBalance": { "type": "number" },
+        "pendingBalance": { "type": "number" },
+        "totalWithdrawn": { "type": "number" },
+        "airdropPoints": { "type": "number" },
+        "referralPoints": { "type": "number" },
+        "dailyStreak": { "type": "number" },
+        "referralCode": { "type": "string" },
+        "referredById": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLoginAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "username", "role", "availableBalance", "airdropPoints"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Microtask specification, slots, and rewards",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 5, "maxLength": 200 },
+        "description": { "type": "string" },
+        "instructions": { "type": "string" },
+        "category": { "type": "string" },
+        "rewardCash": { "type": "number" },
+        "rewardPoints": { "type": "number" },
+        "totalSlots": { "type": "number" },
+        "filledSlots": { "type": "number" },
+        "difficulty": { "type": "string" },
+        "estimatedTime": { "type": "string" },
+        "bannerImage": { "type": "string" },
+        "status": { "type": "string", "enum": ["ACTIVE", "PAUSED", "COMPLETED", "ARCHIVED"] },
+        "startDate": { "type": "string" },
+        "requirements": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "category", "rewardCash", "rewardPoints", "totalSlots", "filledSlots", "status"]
+    },
+    "TaskSubmission": {
+      "title": "TaskSubmission",
+      "description": "User task completion proof submission",
+      "type": "object",
+      "properties": {
+        "taskId": { "type": "string" },
+        "userId": { "type": "string" },
+        "proofScreenshot": { "type": "string" },
+        "proofText": { "type": "string" },
+        "proofUrl": { "type": "string" },
+        "proofUsername": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED"] },
+        "adminComment": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["taskId", "userId", "status", "createdAt"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "User payout withdrawal request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "enum": ["NGN", "USDT"] },
+        "method": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED"] },
+        "paymentRef": { "type": "string" },
+        "adminNotes": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "amount", "currency", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification alert",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "linkUrl": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "message", "isRead", "createdAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "System-wide announcement banner",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "type": { "type": "string" },
+        "targetRole": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "content", "isActive", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile records"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Available microtasks"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "TaskSubmission",
+      "description": "Task proof submissions"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": "Withdrawal",
+      "description": "Withdrawal requests"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Notifications for users"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "Announcement",
+      "description": "Global announcements"
+    }
+  }
+}

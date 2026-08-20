@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // Tasks collection
+    match /tasks/{taskId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Submissions collection
+    match /submissions/{submissionId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+      allow delete: if false;
+    }
+
+    // Withdrawals collection
+    match /withdrawals/{withdrawalId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // Announcements collection
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}
